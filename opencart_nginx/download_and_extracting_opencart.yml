@@ -1,0 +1,51 @@
+    - name: 'Create Folder Opencart'
+      file: 
+        path: /var/www/html/opencart
+        state: directory
+
+    - name: Create dowload directory for Opencart
+      file:
+        path: /usr/src/download
+        state: directory 
+      
+    - name: 'Opencart Download Package'
+      get_url:
+        timeout: 300 
+        url: https://github.com/opencart/opencart/releases/download/4.0.1.1/opencart-4.0.1.1.zip 
+        dest: /usr/src/download/opencart-4.0.1.1.zip
+      register: output
+
+    - name: 'Extracting package'
+      when: output.changed == true
+      unarchive:
+        src: /usr/src/download/opencart-4.0.1.1.zip
+        dest: /usr/src/download/
+        remote_src: yes
+
+    - name: 'Move unzip catalog Opencart in root directory'
+      shell: mv /usr/src/download/upload/* /var/www/html/opencart/
+
+    - name: Copy install file config.php in root directory
+      copy:
+        src: "/var/www/html/opencart/config-dist.php" 
+        dest: "/var/www/html/opencart/config.php"
+        remote_src: yes
+
+    - name: Copy install file to the admin directory
+      copy:
+        src: "/var/www/html/opencart/config-dist.php"
+        dest: "/var/www/html/opencart/admin/config.php"
+        remote_src: yes
+         
+    - name: 'Change the ownership of Opencart directory to the www-data user'
+      file:
+        path: /var/www/html/opencart
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+
+    - name: 'Recursive remove directory Download'
+      file:
+        path: /usr/src/download
+        state: absent

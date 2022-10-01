@@ -1,0 +1,11 @@
+    - name: Import latest version Mariadb
+      shell: curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=10.8
+      
+    - name: Install Mariadb
+      apt:
+        pkg:
+          - mariadb-server
+          - mariadb-client
+        
+    - name: Create user and password database
+      shell: mysql -u root -pmEsh0chek -e "CREATE DATABASE opencart; CREATE USER 'opencart'@localhost IDENTIFIED BY 'mEsh0chek'; GRANT ALL PRIVILEGES ON opencart.* TO opencart@localhost IDENTIFIED BY 'mEsh0chek'; FLUSH PRIVILEGES;"      
